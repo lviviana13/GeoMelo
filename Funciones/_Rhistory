@@ -1,0 +1,256 @@
+library(spdep)
+example(columbus)
+col_nbq <- poly2nb(columbus)
+par.lags1 <- nblag(col_nbq, 6)                  # Orden 2
+e.lw2 <- nb2listw(par.lags1[[6]], style="W",zero.policy=T)
+a.lw <- nb2listw(col_nbq, style="W")
+CRIME <- columbus$CRIME
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moran.bi.R")
+W <- as.matrix(as_dgRMatrix_listw(a.lw))
+moran.bi(columbus$CRIME,columbus$INC,a.lw,zero.policy =T)
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moranbi.test.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/randomize_vector.R")
+set.seed(123)
+MBCrime <- moranbi.test(columbus$CRIME,columbus$INC,a.lw,999,graph=T,zero.policy =T,N=1000)
+x11()
+moranbi.test(columbus$INC,columbus$HOVAL,a.lw,999,graph=T,zero.policy =T,N=1000)
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moranbi.plot.R")
+columbus$CRIME
+scale(columbus$CRIME)
+as.vector(scale(columbus$CRIME))
+CRIME <- as.vector(scale(columbus$CRIME))
+INCOME <- as.vector(scale(columbus$INC))
+moranbi.plot(CRIME,INCOME,quiet =F,zero.policy =F,listw=a.lw)
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moran.cluster.R")
+x11()
+moran.cluster(CRIME, a.lw, zero.policy = FALSE, columbus, significant=T)
+moran.cluster(CRIME, e.lw2, zero.policy = FALSE, columbus, significant=T)
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/getis.cluster.R")
+x11()
+getis.cluster(CRIME, a.lw, zero.policy = FALSE, columbus, significant=T)
+getis.cluster(CRIME, e.lw2, zero.policy = FALSE, columbus, significant=T)
+load("D:/CARLOS/Econometria 2010-I/Espacial/curso/Curso Geografia/SAR2")
+library(lmtest)
+library(RColorBrewer)
+library(classInt)
+library(spdep)
+library(sphet)
+library(RcmdrPlugin.epack)
+library(rCarto)
+library(pgirmess)
+example(columbus)
+coords <- coordinates(columbus)
+rn <- sapply(slot(columbus, "polygons"), function(x) slot(x, "ID"))
+k1 <- knn2nb(knearneigh(coords))
+all.linked <- max(unlist(nbdists(k1, coords)))
+col.nb.0.all <- dnearneigh(coords, 0, all.linked, row.names=rn)
+summary(col.nb.0.all, coords)
+plot(columbus, border="blue")
+plot(col.nb.0.all, coords, add=TRUE)
+title(main=paste("Distance based neighbours 0-", format(all.linked), " distance units", sep=""))
+#######################################################
+# 1. ACCESO A LOS DATOS Y CALCULO PESOS ESPACIALES
+#######################################################
+col_nbq1 <- poly2nb(columbus)
+col.lags <- nblag(col_nbq1, 9)
+col.poly <- columbus
+# col.poly <- readShapePoly("D:/GeoDA/columbus.shp")       # Seleccionar el directorio previamente de GeoDA
+brks <- quantile(col.poly$CRIME, seq(0, 1, 1/max(col.poly$CRIME)))
+cols <- grey((length(brks):2)/length(brks))
+# my.colors <- rev(c("red", "green", "blue","limegreen","brown","darkgrey","yellow","purple","orange","cyan","pink", "white"))                    # asigna colores diferentes, pero sin quantil
+l2 = list("SpatialPolygonsRescale", layout.north.arrow(), offset =  c(6.1,13.5), scale = 0.5)   # Layout
+l3 = list("SpatialPolygonsRescale", layout.scale.bar(), offset = c(6.6,13.5),  scale = 0.5, fill=c("transparent","black"))
+l4 = list("sp.text", c(6.6,13.7), "0")
+l5 = list("sp.text", c(7.1,13.7), "500 m")
+spplot(col.poly["CRIME"], scales=list(draw=TRUE), col.regions=cm.colors(20),  sp.layout=list(l2,l3,l4,l5))
+# rainbow(n, start=.7, end=.1), heat.colors(n), terrain.colors(n), topo.colors(n), cm.colors(n)
+source("D:/CARLOS/Doctorado/Tesis Doctoral/Articulo Funciones R/function/Final/northarrow.R")
+source("D:/CARLOS/Doctorado/Tesis Doctoral/Articulo Funciones R/function/Final/scalebar.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moranbi.test.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/randomize_vector.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moran.cluster.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moran.bi.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moran.cluster.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/getis.cluster.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/localmoran.bi.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/moranbi.plot.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/quantile.e.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/sp.na.omit.R")
+source("D:/CARLOS/Estadistica Espacial/Funciones/Lattices/correlogram.d.R")
+# bubble plot equal-frequency class intervals
+plotvar <- round(col.poly@data$CRIME,3)
+nclr <- 5
+plotclr <- brewer.pal(nclr,"YlOrBr")
+#plotclr <- plotclr[nclr:1] # reorder colors if appropriate
+max.symbol.size=6
+min.symbol.size=1
+class <- classIntervals(plotvar, nclr, style="quantile")
+colcode <- findColours(class, plotclr)
+symbol.size <- ((plotvar-min(plotvar))/
+(max(plotvar)-min(plotvar))*(max.symbol.size-min.symbol.size)
++min.symbol.size)
+plot(col.poly)
+col.poly.cntr <- coordinates(col.poly)
+points(col.poly.cntr, pch=16, col=colcode, cex=symbol.size)
+points(col.poly.cntr, cex=symbol.size)
+text(8.1,15.2, "Area: Equal-Frequency Class Intervals")
+legend(locator(1), legend=names(attr(colcode, "table")), fill=attr(colcode, "palette"), cex=0.8, bty="n")
+Data <- col.poly@data
+coordinates(Data) <- c("X","Y")
+bubble(Data,"CRIME",maxsize=2,xlim = col.poly@bbox[,1],	ylim = col.poly@bbox[,2], axes=F)
+#plot(columbus,add=T)
+plotvar <- round(col.poly@data$CRIME,1)
+nclr <- 5
+plotclr <- brewer.pal(nclr,"YlOrBr")
+class <- classIntervals(plotvar, nclr, style="quantile")
+colcode <- findColours(class, plotclr)
+plot(col.poly)
+plot(col.poly, col=colcode, add=T)
+# title(main="Tasa de Criminalidad", sub="Cuantiles (Igual-Frecuencia) Intervalos de Clase")
+# mtext("Cuantiles (Igual-Frecuencia) Intervalos de Clase", side=1)
+legend(locator(1), legend=names(attr(colcode, "table")), fill=attr(colcode, "palette"), cex=0.8, bty="n")
+northarrow(c(10.1,14.5),0.2,cex=0.6)
+scalebar(c(6.1,10.7),length=1,unit="m",division.cex=0.6)
+quantile.e(x=col.poly@data$CRIME,ic=5,digits=1,style="quantile",border=col.poly,size=0.3, xn=10.1,yn=14.5,xsb=6.1,ysb=10.7,length=1,unit="m")
+#scale <- sqrt(columbus$CRIME/max(columbus$CRIME))*70
+#scale <- scale[order(columbus$CRIME, decreasing = TRUE)]
+#symbols(coords[,1:2][order(columbus$CRIME, decreasing = TRUE),],circle=scale/200,bg=grey(.8),fg=grey(.5),
+#inches=FALSE,add=TRUE)
+#o.nb <- data(columbus.gal)                      # Archivo de pesos generado en GeoDA
+o.nb <- read.gal("C:/Program Files/R/R-3.3.3/library/spdep/etc/weights/columbus.gal")
+o.nb[[1]]                                                 # Vecinos al poligono 1
+o.nb[[49]]                                                # Vecinos al poligono 49
+# Correlograma Moran a partir de matriz contiguidad espacial
+sp.cr <- sp.correlogram(o.nb, col.poly@data$CRIME, order=7, method="corr", style="W", zero.policy=T)
+cor.s <- sp.correlogram(o.nb, col.poly@data$CRIME, order=9, method="I", style="W", zero.policy=T)
+plot(cor.s)
+# Correlograma Moran a partir de matriz distancias
+corD <- correlog(coords,col.poly@data$CRIME,method="Moran",nbclass=20)
+corD
+plot(corD)
+cord <- correlogram.d(coords,col.poly@data$CRIME,method="Moran",nbclass=20)
+cord
+IDs <- row.names(as(col.poly, "data.frame"))
+col.kn7<-knn2nb(knearneigh(coords, k=7), row.names=IDs)
+sp.cr <- sp.correlogram(col.kn7, col.poly@data$CRIME, order=7, method="corr", style="W", zero.policy=T)
+cor <- sp.correlogram(col.kn7, col.poly@data$CRIME, order=7, method="I", style="W", zero.policy=T)
+plot(cor)
+o.nb <- read.gal("C:/Program Files/R/R-3.3.3/library/spdep/etc/weights/columbus.gal")
+o.nb <- read.gal("C:/Program Files/R/R-3.4.0/library/spdep/etc/weights/columbus.gal")
+o.nb
+str(o.nb)
+a.lw <- nb2listw(o.nb, style="W")
+a.lwb <- nb2listw(o.nb, style="B")
+a.lw$weights[[1]]
+a.lwb$weights[[1]]
+bin.matrix <- matrix(0, ncol=length(o.nb), nrow=length(o.nb))
+for (i in 1:length(o.nb)){
+for (k in 1:length(o.nb[[i]]))
+{
+bin.matrix[i, o.nb[[i]][k]] <- 1
+}
+}
+bin.matrix
+as_dgRMatrix_listw(a.lwb)
+bin.matrix.1<-as_dgRMatrix_listw(a.lwb)
+as.matrix(bin.matrix.1)
+bin.matrix[1:6, 1:14]
+x11()
+image(as_dgRMatrix_listw(a.lw))                   # Ponderación estandarizada por fila
+image(as_dgRMatrix_listw(a.lwb))                  # Ponderación binaria
+image(bin.matrix)
+CRIME <- as.data.frame(col.poly)$CRIME
+x <- c(CRIME)
+x.media <- mean(x)
+x.centrado <- x - x.media
+scx <- sum(x.centrado^2)                          # Suma de Cuadrados de x (variable crimen)
+scx1 <- var(x)*(length(x)-1)                      # Suma de Cuadrados de x (variable crimen), más rápido.
+crossprod(x.centrado)
+wy <- matrix(0, ncol=1, nrow=length(CRIME))
+for (i in 1:length(CRIME)){
+vec <- matrix(0, nrow=length(o.nb[[i]]))
+for (j in 1:length(o.nb[[i]])){
+vec[j,]<-  CRIME[o.nb[[i]][j]]*a.lw$weights[[i]][j]
+wy[i,] <- sum(vec)
+}
+}
+wy
+W <- as.matrix(as_dgRMatrix_listw(a.lw))
+Y <- CRIME
+WY <- W%*%Y
+WY
+lag.listw(a.lw, CRIME)                      # Directamente en el paquete "spdep"
+N <- length(CRIME)
+N
+N <- length(CRIME)
+S <- sum(unlist(a.lw$weights))
+I <- (N/S)*((sum(x.centrado * wy))/scx)
+I <- as.vector(scale(Y))%*%W%*%as.vector(scale(Y))/as.vector(scale(Y))%*%as.vector(scale(Y))
+I
+I
+K <- (length(x) * sum(x.centrado^4))/(scx^2)
+moran(x, listw=a.lw, n=length(o.nb), S0=S)       # Cambiar por "x1", para la estandarización
+plot(moran(x, listw=a.lw, n=length(o.nb), S0=S))
+set.seed(123)
+moran.test(x, nb2listw(o.nb, style="W"))
+x11()
+set.seed(123)
+moran.test(x, nb2listw(o.nb, style="W"))
+Z.I <- (0.485770914-(-0.020833333))/sqrt(0.008991121)
+Z.I
+set.seed(123)
+geary.test(x, nb2listw(o.nb, style="W"))
+(0.547803377-1)/sqrt(0.009804108)
+globalG.test(x, nb2listw(o.nb, style="B"))
+x1<-(x-mean(x))/sd(x)
+mp<-moran.plot(x1, a.lw, main="Gráfico de Dispersión de Moran", ylim=c(-2,2))      # Cambiar por "x1", para la estandarización
+set.seed(127)
+mc<-moran.mc(x, a.lw, nsim=1000)                                # Se rechaza Ho:rho=0, es decir hay autocorrelación espacial.
+mc
+moran.bi(col.poly@data$CRIME,col.poly@data$INC,a.lw,zero.policy =T)
+set.seed(123)
+moranbi.test(col.poly@data$CRIME,col.poly@data$INC,a.lw,zero.policy =T,adjust.n=TRUE,N=999,graph=T,print.results=T)
+x1<-(x-mean(x))/sd(x)
+mp<-moran.plot(x1, a.lwq1, main="Gráfico de Dispersión de Moran")      # Cambiar por "x1", para la estandarización
+infl1 <- apply(mp$is.inf, 1, any)
+lhx1 <- cut(col.poly@data$CRIME, breaks=c(min(col.poly@data$CRIME), mean(col.poly@data$CRIME), max(col.poly@data$CRIME)), labels=c("L", "H"), include.lowest=TRUE)
+wx1 <- lag(a.lwq1, columbus$CRIME)
+lhwx1 <- cut(wx1, breaks=c(min(wx1), mean(wx1), max(wx1)), labels=c("L", "H"), include.lowest=TRUE)
+lhlh1 <- interaction(lhx1, lhwx1, infl1, drop=TRUE)
+cols1 <- rep(1, length(lhlh1))
+cols1[lhlh1 == "L.L.TRUE"] <- 2
+cols1[lhlh1 == "L.H.TRUE"] <- 3
+cols1[lhlh1 == "H.L.TRUE"] <- 4
+cols1[lhlh1 == "H.H.TRUE"] <- 5
+plot(columbus, col=colcode[cols1])          # gray.colors(4, 0.95, 0.55, 2.2)[cols])
+legend(locator(1), legend=c("None", "LL", "LH", "HL", "HH"), fill=attr(colcode, "palette"), bty="n", cex=1, y.intersp=0.8)
+Commander()
+lm_fit <- lm(CRIME ~ INC + HOVAL, data=columbus)
+summary(lm_fit)
+columbus$lm_res <- residuals(lm_fit)
+residuals(lm_fit)
+shapiro.test(columbus$lm_res)
+spplot(columbus["lm_res"], col.regions = rev(terrain.colors(20)))
+spplot(columbus["lm_res"], col.regions = rev(terrain.colors(5)))
+spplot(columbus["lm_res"], col.regions = rev(terrain.colors(40)))
+pal2 <- colorRampPalette(c("red3", "wheat1", "blue3"))
+spplot(columbus,"lm_res", col.regions = pal2(20))
+my.palette <- brewer.pal(n = 9, name = "YlOrRd")
+spplot(columbus, "lm_res", col.regions = my.palette, cuts = 8, col = "transparent")
+breaks.ci <- classIntervals(columbus$lm_res, n = 9, style = "quantile", intervalClosure = "right")$brks
+# se amplian los limites inferior y superior en: .Machine$double.eps*5000000000000,  con el fin que un poligono no quede siempre en blanco.
+breaks.ci[1] <- breaks.ci[1] - .Machine$double.eps*5000000000000
+breaks.ci[length(breaks.ci)] <- breaks.ci[length(breaks.ci)] + .Machine$double.eps*5000000000000
+spplot(columbus, "lm_res", col = "transparent", col.regions = my.palette,  at = breaks.ci)
+lm.morantest(lm_fit, a.lwq1)
+dwtest(CRIME ~ INC + HOVAL, data=columbus, alternative = "two.sided")
+acf(columbus$lm_res)
+LM_res <- lm.LMtests(lm_fit, a.lw, test = "all")
+t(sapply(LM_res, function(x) unlist(x[1:3])))
+u <- resid(lm_fit)
+sigma2 <- (t(u) %*% u)/nrow(W)
+T1 <- sum(diag(t(W)%*%W+W%*%W))
+LM.ERR <- (((t(u)%*%W%*%u)/sigma2)^2)/T1
+p.value <- 1-pchisq(LM.ERR,1)
+p.value
+bptest(lm_fit)
