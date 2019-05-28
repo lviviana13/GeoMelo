@@ -27,14 +27,7 @@ library(ggplot2)
 #Ingresar matriz de pesos
 
 
-R1 <- c(0	,1,	0,	0,	0,	0,	0)
-R2 <- c(1	,0,	1,	0	,0	,0	,0)
-R3 <- c(0,	1,	0,	1,	0,	0,	0)
-R4 <- c(0	,0,	1,	0,	1,	0,	0)
-R5 <- c(0,	0,	0,	1,	0,	1,	0)
-R6 <- c(0,	0,	0,	0,	1,	0,	1)
-R7  <- c(0,	0,	0	,0	,0	,1,	0)
-matrizpesos <- matrix(scan(), ncol=7)
+
 
 
 

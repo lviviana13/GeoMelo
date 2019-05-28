@@ -1,0 +1,67 @@
+Cuando se trabajan con datos de corte transversal puede existir los siguientes problemas:
+
+1. Heterogeneidad espacial
+
+Cuando, para explicar un fenómeno concreto, se utilizan datos procedentes de unidades espaciales muy diferentes entre sí ...           Este hecho puede conllevar la aparición de problemas de heteroscedasticidad y/o inestabilidad estructural.
+
+
+2.Autocorrelación o dependencia espacial
+
+Cuando existe una relación funcional entre lo que ocurre en un punto determinado del espacio y lo que ocurre en otro lugar. 
+
+2.1 Autocorrelación Espacial Positiva : Cuando regiones “vecinas” tienden a mostrar valores similares de una variable ... cuando valores elevados o bajos de una variable tienden a estar agrupados en el espacio. Un ejemplo sería el llamado efecto contagio o desbordamiento.
+
+
+2.2 Autocorrelación Espacial Negativa : Cuando localizaciones “vecinas” tienden a mostrar valores de una variable muy diferentes entre sí (casillas blancas y negras de un tablero de ajedrez). Un ejemplo sería un esquema Centro-Periferia.
+
+2.3 Distribución aleatoria: Ausencia de autocorrelación espacial.
+
+Dos posibles razones:
+1º Errores de Medida: escasa correspondencia entre la extensión espacial del fenómeno económico bajo estudio y las unidades espaciales de observación.  AUTOCORRELACIÓN ESPÚRIA
+
+2°  Interacción espacial entre unidades espaciales: Externalidades espaciales (spillovers): Efectos desbordamiento de las infraestructuras o difusión tecnológica entre economías.
+
+
+como la autocorrelación espacial puede ser expresada por la covarianza  pero esto requiere que la relación se unidireccional, pero en el espacio la cosa es multidireccional entonces se requiere una notación espcifica que seria: OPERADOR RETARDO ESPACIAL, Wy: refleja un promedio ponderado de los valores de la variable en las regiones “vecinas” 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+donde W es W : Matriz de pesos espacial (spatial weight matrix), matriz  N por N positiva y, en principio, simétrica
+
+
+El Análisis Exploratorio de Datos Espaciales (AEDE) es un conjunto de técnicas que describen y visualizan la distribución espacial de una variable, permitiendo detectar patrones de comportamiento de dicha distribución en el territorio. Así, permite detectar...
+ 
+ Tendencias espaciales
+
+ Esquemas de asociación espacial (clusters espaciales) 
+
+ Identificar localizaciones atípicas (outliers espaciales)
+
+ Identificar diferentes regímenes espaciales u otras formas de inestabilidad espacial (no estacionariedad espacial
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+
+La Econometría  Espacial se consideran elementos relacionados con el espacio físico en el cual se ubican las observaciones e Incorpora las herramientas necesarias para allegar los efectos espaciales, uno de ellos se denomina dependencia espacial; su presencia, traducida en auto-correlación espacial, puede invalidar modelos econométricos tradicionales. 
+
+Para la presencia de auto-correlación espacial se pueden utilizar diversos estadísticos, entre los cuales se encuentra el de Moran. Los test para la detección de la auto-correlación espacial pueden dar como resultado la existencia de una falsa dependencia espacial, llamada dependencia espacial espuria.  Este resultado podría presentarse cuando una región con nas caracterísicas bien definidas (como cultura, alimentación, estilo de vida, preferencias, etc) aparece dividida en varias subregiones por cuestiones políticas, administrativas, etc, 
+
+La auto-correlación espacial espuria puede ser definida como el fenómeno en el cual existe una aparente dependencia espacial entre las regiones, pero en realidad es producida por la consideración  de lo que en la práctica es una sola región, como dos o más regiones independientes. 
+
+La dependencia espacial es el fenómeno que se presenta cuando los valores observados de una variable en una región dependen de los valores observados de la misma variable en las regiones vecinas. El proceso generado de datos del primer caso para dos regiones puede tomar la siguiente forma:
+
+Para comprobar la presencia de dependencia espacial en una población a través de la I de Moran, se valida la significancia del parámetro ρ en un modelo SAR(1) 
+
+
+
+[1]  Torres, A. Ceballos, Luis, Arbeláez. Aplicación de la econometría espacial para el análisis de la miseria en los municipios del departamento de antioquía. Semestre Económico, volumen 18, No. 37, pp. 103-128 – ISSN 0120-6346, 2015, Medellín, Colombia.
+
+
