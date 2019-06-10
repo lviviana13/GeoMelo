@@ -1,0 +1,1 @@
+#Desarrollo de Ejemplos Libro: Introducción a la Geoestadística. Giraldo Heano 2011 
